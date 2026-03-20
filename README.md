@@ -157,7 +157,7 @@ erDiagram
       string username UK
       string password
       string role
-      int staff_id FK_UK
+      int staff_id FK
       string is_active
     }
 ```
