@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📚 Quản Lý Thư Viện - Đăng Nhập</title>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --secondary: #06b6d4;
+      --success: #10b981;
+      --danger: #ef4444;
+      --bg: #f0f9ff;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-light: #475569;
+      --border: #e0f2fe;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+      background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .login-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      display: inline-block;
+      animation: bounce 0.6s ease;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .login-header h1 {
+      font-size: 28px;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .login-header p {
+      color: var(--text-light);
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: #f8fafc;
+      color: var(--text);
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+      background: white;
+    }
+
+    .form-input::placeholder {
+      color: var(--text-light);
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 13px 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 25px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+    }
+
+    .login-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+    }
+
+    .login-button:active {
+      transform: translateY(0);
+    }
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+
+    .footer-text {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .brand-logo {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .login-card {
+        padding: 30px 20px;
+      }
+
+      .login-header h1 {
+        font-size: 24px;
+      }
+
+      .login-icon {
+        font-size: 40px;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <div class="brand-logo">
+    📚 VibeLib
+  </div>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-icon">📖</div>
+        <h1>Đăng Nhập</h1>
+        <p>Quản Lý Thư Viện Thông Minh</p>
+      </div>
+
+      <div class="error-message" id="error-msg"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">👤 Tên Người Dùng</label>
+          <input 
+            type="text" 
+            id="username" 
+            class="form-input" 
+            placeholder="Nhập tên người dùng"
+            autocomplete="username"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">🔐 Mật Khẩu</label>
+          <input 
+            type="password" 
+            id="password" 
+            class="form-input" 
+            placeholder="Nhập mật khẩu"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <button type="submit" class="login-button">
+          ✨ Đăng Nhập
+        </button>
+      </form>
+
+      <div class="footer-text">
+        🔒 Thông tin được bảo mật tuyệt đối
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorMsg = document.getElementById('error-msg');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.classList.remove('show');
+
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!username || !password) {
+        showError('Vui lòng nhập đầy đủ thông tin');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/v1/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && (data.access_token || data.message === "Login successful")) {
+          const token = data.access_token || `${username}_${data.role || 'librarian'}_simple`;
+          const role = data.role || 'librarian';
+          const staffId = data.staff_id ?? 1;
+          const staffName = data.staff_name || username;
+          const storedUsername = data.username || username;
+
+          localStorage.setItem('token', token);
+          localStorage.setItem('role', role);
+          localStorage.setItem('staff_id', staffId);
+          localStorage.setItem('staff_name', staffName);
+          localStorage.setItem('username', storedUsername);
+
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 300);
+        } else {
+          showError(data.detail || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showError('Không thể kết nối đến máy chủ. Vui lòng thử lại');
+      }
+    });
+
+    function showError(message) {
+      errorMsg.textContent = message;
+      errorMsg.classList.add('show');
+      setTimeout(() => {
+        errorMsg.classList.remove('show');
+      }, 4000);
+    }
+
+    // Auto-focus on page load
+    setTimeout(() => usernameInput.focus(), 100);
+  </script>
+</body>
+</html>

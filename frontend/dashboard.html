@@ -1,0 +1,3403 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📚 VibeLib - Quản Lý Thư Viện</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --primary-dark: #1e40af;
+      --secondary: #0891b2;
+      --accent: #06b6d4;
+      --success: #059669;
+      --warning: #f59e0b;
+      --danger: #dc2626;
+      
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      
+      --bg: #ffffff;
+      --surface: #f9fafb;
+      --surface-alt: #f3f4f6;
+      --text: #111827;
+      --text-secondary: #6b7280;
+      --border: #e5e7eb;
+      
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 12px;
+      --spacing-lg: 16px;
+      --spacing-xl: 24px;
+      --spacing-2xl: 32px;
+      
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+      --font-base: "Be Vietnam Pro", "Segoe UI", sans-serif;
+
+      --fs-12: 12px;
+      --fs-14: 14px;
+      --fs-16: 16px;
+      --fs-18: 18px;
+      --fs-20: 20px;
+      --fs-24: 24px;
+      --fs-30: 30px;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-alt: #334155;
+      --text: #f9fafb;
+      --text-secondary: #cbd5e1;
+      --border: #334155;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-base);
+      font-size: var(--fs-16);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.68;
+      letter-spacing: 0.1px;
+      transition: background 0.3s ease, color 0.3s ease;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.16) 0%, transparent 28%),
+        radial-gradient(circle at 90% 15%, rgba(8, 145, 178, 0.16) 0%, transparent 32%),
+        radial-gradient(circle at 50% 95%, rgba(6, 182, 212, 0.14) 0%, transparent 30%);
+      animation: floatBg 14s ease-in-out infinite;
+    }
+
+    @keyframes floatBg {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(0, -8px, 0) scale(1.02); }
+    }
+
+    /* ===== LAYOUT ===== */
+    .app-wrapper {
+      display: block;
+      min-height: 100vh;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: var(--spacing-xl) var(--spacing-lg);
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 272px;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-2xl);
+      padding-bottom: var(--spacing-xl);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-icon {
+      font-size: 32px;
+    }
+
+    .sidebar-branding {
+      flex: 1;
+    }
+
+    .sidebar-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-subtitle {
+      font-size: 12px;
+      opacity: 0.85;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .user-card {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-avatar {
+      font-size: 40px;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .user-name {
+      font-size: var(--fs-16);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .user-role {
+      font-size: var(--fs-14);
+      opacity: 0.85;
+      font-weight: 500;
+    }
+
+    .nav-menu {
+      flex: 1;
+      list-style: none;
+    }
+
+    .nav-section {
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .nav-section-title {
+      font-size: var(--fs-12);
+      font-weight: 800;
+      text-transform: uppercase;
+      opacity: 0.65;
+      letter-spacing: 0.9px;
+      padding: var(--spacing-md) var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md) var(--spacing-lg);
+      margin-bottom: 6px;
+      border-radius: var(--radius-md);
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: var(--fs-16);
+      font-weight: 600;
+      border-left: 3px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-item::after {
+      content: "";
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 5px;
+      height: 2px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.9);
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 0.22s ease;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-left-color: white;
+      transform: translateX(4px);
+    }
+
+    .nav-item:hover::after,
+    .nav-item.active::after {
+      transform: scaleX(1);
+    }
+
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+      border-left-color: white;
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .nav-label {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-footer {
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .logout-btn {
+      width: 100%;
+      padding: var(--spacing-md) var(--spacing-lg);
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-md);
+      font-size: var(--fs-15, 15px);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+    }
+
+    .logout-btn:hover {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    /* ===== MAIN ===== */
+    .main-content {
+      margin-left: 272px;
+      width: calc(100% - 272px);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: color-mix(in srgb, var(--bg) 84%, white 16%);
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 88%, white 12%);
+      padding: 18px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 24px rgba(2, 6, 23, 0.06);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .header-left h1 {
+      font-size: var(--fs-30);
+      font-weight: 800;
+      color: var(--text);
+      margin: 0;
+      letter-spacing: -0.3px;
+    }
+
+    .header-right {
+      display: flex;
+      gap: var(--spacing-lg);
+      align-items: center;
+    }
+
+    .theme-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      cursor: pointer;
+      font-size: 19px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .theme-btn:hover {
+      background: var(--bg);
+      border-color: var(--primary-light);
+      transform: scale(1.05);
+    }
+
+    .header-right {
+      position: relative;
+    }
+
+    .user-menu {
+      position: relative;
+    }
+
+    .user-menu-panel {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      width: 230px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 8px;
+      display: none;
+      z-index: 1500;
+    }
+
+    .user-menu.open .user-menu-panel {
+      display: block;
+      animation: dropIn 0.16s ease;
+    }
+
+    @keyframes dropIn {
+      from { transform: translateY(-6px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .menu-item {
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .menu-item:hover {
+      background: var(--surface-alt);
+    }
+
+    /* ===== CONTENT ===== */
+    .content {
+      flex: 1;
+      padding: 30px 34px;
+      overflow-y: auto;
+      width: 100%;
+    }
+
+    .tab-content {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .page-title {
+      font-size: clamp(28px, 3.4vw, 40px);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: var(--spacing-sm);
+      line-height: 1.15;
+      letter-spacing: -0.4px;
+    }
+
+    .page-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-2xl);
+      font-size: var(--fs-16);
+      font-weight: 500;
+    }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-light);
+    }
+
+    .stat-icon {
+      font-size: 32px;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: var(--fs-12);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .stat-value {
+      font-size: clamp(34px, 4vw, 42px);
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: var(--spacing-md);
+      line-height: 1.1;
+    }
+
+    .stat-change {
+      font-size: var(--fs-14);
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    /* ===== SECTIONS GRID ===== */
+    .sections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .section-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .section-card:hover {
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-light);
+      transform: translateY(-2px);
+    }
+
+    .section-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: var(--spacing-lg) var(--spacing-xl);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .section-icon {
+      font-size: 24px;
+    }
+
+    .section-title {
+      font-size: var(--fs-18);
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -0.2px;
+    }
+
+    .section-body {
+      padding: var(--spacing-xl);
+    }
+
+    .section-body p {
+      color: var(--text-secondary);
+      font-size: var(--fs-16);
+      font-weight: 500;
+      line-height: 1.6;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+      padding: 12px 22px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: var(--fs-15, 15px);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active,
+    .theme-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .btn:focus-visible,
+    .input:focus-visible,
+    .select:focus-visible,
+    .theme-btn:focus-visible {
+      outline: 3px solid rgba(59, 130, 246, 0.35);
+      outline-offset: 2px;
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 999px;
+      transform: scale(0);
+      pointer-events: none;
+      animation: rippleAnim 580ms ease-out;
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    @keyframes rippleAnim {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    .btn-secondary {
+      background: var(--surface-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    /* ===== COMMON UI ===== */
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+      flex-wrap: wrap;
+    }
+
+    .page-head > :first-child {
+      flex: 1 1 320px;
+      min-width: 260px;
+    }
+
+    .actions {
+      display: flex;
+      gap: var(--spacing-md);
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      flex: 0 1 auto;
+      max-width: 100%;
+    }
+
+    .actions .input {
+      width: 320px;
+      max-width: 100%;
+    }
+
+    .card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+      overflow: hidden;
+      margin-bottom: var(--spacing-lg);
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .reveal.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-head {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--spacing-md);
+      background: var(--surface);
+      flex-wrap: wrap;
+    }
+
+    .card-title {
+      font-size: var(--fs-18);
+      font-weight: 800;
+      color: var(--text);
+      margin: 0;
+      flex: 1 1 240px;
+      min-width: 200px;
+    }
+
+    .card-body {
+      padding: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: var(--fs-12);
+      color: var(--text-secondary);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.85px;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+      font-size: var(--fs-16);
+      font-weight: 500;
+      font-family: inherit;
+    }
+
+    .input:focus,
+    .select:focus {
+      border-color: var(--primary-light);
+      background: var(--bg);
+    }
+
+    .hint {
+      color: var(--text-secondary);
+      font-size: var(--fs-14);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    [data-tooltip] {
+      position: relative;
+    }
+
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) translateY(-4px);
+      bottom: calc(100% + 8px);
+      white-space: nowrap;
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      z-index: 1300;
+    }
+
+    [data-tooltip]:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface-alt) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite linear;
+      border-radius: 8px;
+    }
+
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to { background-position: -200% 0; }
+    }
+
+    .carousel {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.4s ease;
+    }
+
+    .carousel-slide {
+      min-width: 100%;
+      padding: 18px;
+    }
+
+    .carousel-dots {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      padding: 10px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 0;
+      cursor: pointer;
+      background: var(--gray-300);
+    }
+
+    .dot.active {
+      background: var(--primary);
+      transform: scale(1.15);
+    }
+
+    .accordion {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .accordion-item + .accordion-item {
+      border-top: 1px solid var(--border);
+    }
+
+    .accordion-btn {
+      width: 100%;
+      border: 0;
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      padding: 12px 14px;
+      font-weight: 600;
+      transition: background 0.18s ease;
+    }
+
+    .accordion-btn:hover {
+      background: var(--surface-alt);
+    }
+
+    .accordion-panel {
+      display: none;
+      padding: 0 14px 12px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .accordion-item.open .accordion-panel {
+      display: block;
+      animation: fadeInPanel 0.2s ease;
+    }
+
+    @keyframes fadeInPanel {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 3000;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(620px, 96vw);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 16px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface-alt);
+      transform: translateY(-1px);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+      background: var(--bg);
+    }
+
+    .table th,
+    .table td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: var(--fs-14);
+      font-weight: 500;
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    .table th {
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 800;
+      font-size: var(--fs-12);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      z-index: 1;
+    }
+
+    .table td.mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      justify-content: flex-end;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
+    }
+
+    .badge.success {
+      border-color: rgba(5, 150, 105, 0.25);
+      background: rgba(5, 150, 105, 0.12);
+      color: #059669;
+    }
+
+    .badge.warning {
+      border-color: rgba(245, 158, 11, 0.25);
+      background: rgba(245, 158, 11, 0.12);
+      color: #b45309;
+    }
+
+    .badge.danger {
+      border-color: rgba(220, 38, 38, 0.25);
+      background: rgba(220, 38, 38, 0.12);
+      color: #dc2626;
+    }
+
+    .toast-wrap {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 5000;
+    }
+
+    .toast {
+      min-width: 280px;
+      max-width: 420px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      padding: 12px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      animation: toastIn 0.2s ease;
+    }
+
+    .toast.success { border-left-color: var(--success); }
+    .toast.warning { border-left-color: var(--warning); }
+    .toast.danger { border-left-color: var(--danger); }
+
+    .toast-title {
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .toast-msg {
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .app-wrapper {
+        display: block;
+      }
+
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 272px;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-wrapper {
+        display: block;
+      }
+
+      .header {
+        padding: var(--spacing-lg);
+      }
+
+      .content {
+        padding: var(--spacing-lg);
+      }
+
+      .page-title {
+        font-size: 22px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sections-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        transform: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-title {
+        font-size: 18px;
+      }
+
+      .stat-value {
+        font-size: 24px;
+      }
+
+      .header-right {
+        gap: var(--spacing-md);
+      }
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--surface);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-icon">📚</div>
+        <div class="sidebar-branding">
+          <div class="sidebar-title">VibeLib</div>
+          <div class="sidebar-subtitle">Hệ thống thư viện</div>
+        </div>
+      </div>
+
+      <div class="user-card">
+        <div class="user-avatar">👤</div>
+        <div class="user-name" id="staff-name">Admin User</div>
+        <div class="user-role" id="user-role">Administrator</div>
+      </div>
+
+      <nav class="nav-menu">
+        <!-- Home -->
+        <div class="nav-section">
+          <div class="nav-item active" onclick="switchTab('dashboard', event)">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Bảng điều khiển</div>
+          </div>
+        </div>
+
+        <!-- Books Management -->
+        <div class="nav-section">
+          <div class="nav-section-title">📖 Sách</div>
+          <div class="nav-item" onclick="switchTab('categories', event)">
+            <div class="nav-icon">📁</div>
+            <div class="nav-label">Categories</div>
+          </div>
+          <div class="nav-item" onclick="switchTab('titles', event)">
+            <div class="nav-icon">📕</div>
+            <div class="nav-label">Đầu sách</div>
+          </div>
+          <div class="nav-item" onclick="switchTab('copies', event)">
+            <div class="nav-icon">📗</div>
+            <div class="nav-label">Bản sao</div>
+          </div>
+        </div>
+
+        <!-- Readers Management -->
+        <div class="nav-section">
+          <div class="nav-section-title">👥 Độc giả</div>
+          <div class="nav-item" onclick="switchTab('readers', event)">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Độc giả</div>
+          </div>
+          <div class="nav-item" onclick="switchTab('cards', event)">
+            <div class="nav-icon">🎫</div>
+            <div class="nav-label">Thẻ thư viện</div>
+          </div>
+        </div>
+
+        <!-- Transactions -->
+        <div class="nav-section">
+          <div class="nav-section-title">📋 Giao dịch</div>
+          <div class="nav-item" onclick="switchTab('borrows', event)">
+            <div class="nav-icon">📤</div>
+            <div class="nav-label">Mượn/Trả</div>
+          </div>
+          <div class="nav-item" onclick="switchTab('reports', event)">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">Báo cáo</div>
+          </div>
+        </div>
+
+        <!-- Admin -->
+        <div class="nav-section" id="admin-section" style="display: none;">
+          <div class="nav-section-title">⚙️ Admin</div>
+          <div class="nav-item" onclick="switchTab('staff', event)">
+            <div class="nav-icon">👨‍💼</div>
+            <div class="nav-label">Nhân viên</div>
+          </div>
+          <div class="nav-item" onclick="switchTab('accounts', event)">
+            <div class="nav-icon">🔑</div>
+            <div class="nav-label">Tài khoản</div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="handleLogout()">
+          <span>🚪</span>
+          <span>Đăng xuất</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- HEADER -->
+      <header class="header">
+        <div class="header-left">
+          <h1>📊 Bảng điều khiển</h1>
+        </div>
+        <div class="header-right">
+          <button class="theme-btn" onclick="copyApiEndpoint()" data-tooltip="Sao chép API endpoint" title="Sao chép API endpoint">
+            🔗
+          </button>
+          <button class="theme-btn" onclick="openHelpModal()" data-tooltip="Hướng dẫn nhanh" title="Hướng dẫn nhanh">
+            ❔
+          </button>
+          <button class="theme-btn" onclick="toggleTheme()" title="Đổi sáng/tối" data-tooltip="Chế độ tối">
+            <span id="theme-icon">🌙</span>
+          </button>
+          <div class="user-menu" id="user-menu">
+            <button class="theme-btn" onclick="toggleUserMenu(event)" data-tooltip="Tùy chọn tài khoản" title="Tùy chọn tài khoản">☰</button>
+            <div class="user-menu-panel">
+              <button class="menu-item" onclick="switchTab('dashboard', event)">🏠 Về trang chính</button>
+              <button class="menu-item" onclick="copyApiEndpoint()">🔗 Sao chép API</button>
+              <button class="menu-item" onclick="openHelpModal()">📘 Hướng dẫn sử dụng</button>
+              <button class="menu-item" onclick="handleLogout()">🚪 Đăng xuất</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <div class="content">
+        <!-- DASHBOARD TAB -->
+        <div id="dashboard-tab" class="tab-content">
+          <div class="page-title">👋 Xin chào quay lại</div>
+          <div class="page-subtitle">Tổng quan nhanh hoạt động thư viện hôm nay</div>
+
+          <!-- STATS -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">📚</div>
+              <div class="stat-label">Tổng số bản sao</div>
+              <div class="stat-value" id="stat-books">—</div>
+              <div class="stat-change" id="stat-books-hint">Đang tải...</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">👥</div>
+              <div class="stat-label">Độc giả đang hoạt động</div>
+              <div class="stat-value" id="stat-readers">—</div>
+              <div class="stat-change" id="stat-readers-hint">Đang tải...</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📤</div>
+              <div class="stat-label">Phiếu mượn đang mở</div>
+              <div class="stat-value" id="stat-borrows">—</div>
+              <div class="stat-change" id="stat-borrows-hint">Đang tải...</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⚠️</div>
+              <div class="stat-label">Sách quá hạn</div>
+              <div class="stat-value" id="stat-overdue">—</div>
+              <div class="stat-change" id="stat-overdue-hint" style="color: var(--text-secondary);">Chưa theo dõi chi tiết</div>
+            </div>
+          </div>
+
+          <!-- QUICK ACTIONS -->
+          <div style="margin-bottom: var(--spacing-lg); font-size: 20px; font-weight: 700;">⚡ Tác vụ nhanh</div>
+
+          <div class="sections-grid">
+            <div class="section-card">
+              <div class="section-header">
+                <div class="section-icon">📖</div>
+                <h3 class="section-title">Quản lý sách</h3>
+              </div>
+              <div class="section-body">
+                <p>Thêm, sửa, xóa đầu sách và quản lý bản sao theo trạng thái để kiểm soát kho chính xác.</p>
+                <button class="btn" onclick="switchTab('titles', event)">Đi tới đầu sách →</button>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-header">
+                <div class="section-icon">👥</div>
+                <h3 class="section-title">Quản lý độc giả</h3>
+              </div>
+              <div class="section-body">
+                <p>Cập nhật thông tin độc giả, cấp thẻ thư viện và theo dõi lịch sử mượn trả rõ ràng.</p>
+                <button class="btn" onclick="switchTab('readers', event)">Đi tới độc giả →</button>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-header">
+                <div class="section-icon">📤</div>
+                <h3 class="section-title">Mượn và Trả</h3>
+              </div>
+              <div class="section-body">
+                <p>Xử lý mượn trả nhanh, theo dõi phiếu đang mượn và hạn chế mượn trùng theo quy tắc hệ thống.</p>
+                <button class="btn" onclick="switchTab('borrows', event)">Đi tới giao dịch →</button>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-header">
+                <div class="section-icon">📊</div>
+                <h3 class="section-title">Báo cáo & Phân tích</h3>
+              </div>
+              <div class="section-body">
+                <p>Xem báo cáo đầu sách mượn nhiều, danh sách chưa trả và thống kê tình hình sử dụng thư viện.</p>
+                <button class="btn" onclick="switchTab('reports', event)">Xem báo cáo →</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card reveal">
+            <div class="card-head">
+              <div class="card-title">🎯 Mẹo sử dụng nhanh (Carousel)</div>
+            </div>
+            <div class="card-body">
+              <div class="carousel" id="tips-carousel">
+                <div class="carousel-track" id="tips-track">
+                  <div class="carousel-slide">Bắt đầu bằng mục <b>Độc giả</b> và <b>Thẻ thư viện</b> để đảm bảo dữ liệu mượn trả hợp lệ.</div>
+                  <div class="carousel-slide">Trong mục <b>Mượn/Trả</b>, hệ thống tự chặn trường hợp 1 độc giả mượn nhiều hơn 1 cuốn cùng lúc.</div>
+                  <div class="carousel-slide">Dùng nút <b>🔗</b> ở góc phải để sao chép nhanh endpoint API khi cần test bằng Postman.</div>
+                </div>
+                <div class="carousel-dots" id="tips-dots">
+                  <button class="dot active" onclick="goTip(0)"></button>
+                  <button class="dot" onclick="goTip(1)"></button>
+                  <button class="dot" onclick="goTip(2)"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card reveal">
+            <div class="card-head">
+              <div class="card-title">❓ Câu hỏi thường gặp (Accordion)</div>
+            </div>
+            <div class="card-body">
+              <div class="accordion" id="faq-accordion">
+                <div class="accordion-item">
+                  <button class="accordion-btn" onclick="toggleAccordion(event)">Vì sao không mượn được sách?</button>
+                  <div class="accordion-panel">Thường do độc giả chưa có thẻ active, sách không ở trạng thái available, hoặc độc giả đã có 1 phiếu mượn đang mở.</div>
+                </div>
+                <div class="accordion-item">
+                  <button class="accordion-btn" onclick="toggleAccordion(event)">Admin và thủ thư khác nhau gì?</button>
+                  <div class="accordion-panel">Admin quản lý tài khoản/nhân viên và toàn bộ dữ liệu. Thủ thư tập trung nghiệp vụ sách, độc giả, mượn/trả.</div>
+                </div>
+                <div class="accordion-item">
+                  <button class="accordion-btn" onclick="toggleAccordion(event)">Dữ liệu có tự lưu khi reload không?</button>
+                  <div class="accordion-panel">Có. Dữ liệu lưu ở backend SQLite, còn theme và thông tin phiên đăng nhập lưu trong localStorage.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CATEGORIES -->
+        <div id="categories-tab" class="tab-content" style="display: none;">
+          <div class="page-head">
+            <div>
+              <div class="page-title">📁 Thể loại sách</div>
+              <div class="page-subtitle">Quản lý thể loại sách</div>
+            </div>
+            <div class="actions">
+              <input class="input" id="categories-search" placeholder="Tìm theo mã / tên..." oninput="renderCategories()" />
+              <button class="btn" onclick="openCategoryForm()">+ Thêm</button>
+              <button class="btn btn-secondary" onclick="loadCategories(true)">↻ Tải lại</button>
+            </div>
+          </div>
+
+          <div class="card" id="category-form-card" style="display:none;">
+            <div class="card-head">
+              <div class="card-title" id="category-form-title">Thêm category</div>
+              <div class="row-actions">
+                <button class="btn btn-ghost" onclick="closeCategoryForm()">Đóng</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Mã thể loại</label>
+                  <input class="input" id="category_code" placeholder="VD: TL001" />
+                </div>
+                <div class="field">
+                  <label>Tên</label>
+                  <input class="input" id="category_name" placeholder="VD: Khoa học" />
+                </div>
+                <div class="field">
+                  <label>Mô tả</label>
+                  <input class="input" id="category_desc" placeholder="(tuỳ chọn)" />
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn" onclick="saveCategory()">Lưu</button>
+                <button class="btn btn-secondary" onclick="closeCategoryForm()">Huỷ</button>
+              </div>
+              <div class="hint">Lưu ý: Không thể xoá category nếu đã có book title.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table" id="categories-table"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TITLES -->
+        <div id="titles-tab" class="tab-content" style="display: none;">
+          <div class="page-head">
+            <div>
+              <div class="page-title">📕 Đầu sách</div>
+              <div class="page-subtitle">Quản lý đầu sách</div>
+            </div>
+            <div class="actions">
+              <input class="input" id="titles-search" placeholder="Tìm theo mã / tên / tác giả..." oninput="renderTitles()" />
+              <button class="btn" onclick="openTitleForm()">+ Thêm</button>
+              <button class="btn btn-secondary" onclick="loadTitles(true)">↻ Tải lại</button>
+            </div>
+          </div>
+
+          <div class="card" id="title-form-card" style="display:none;">
+            <div class="card-head">
+              <div class="card-title" id="title-form-title">Thêm book title</div>
+              <div class="row-actions">
+                <button class="btn btn-ghost" onclick="closeTitleForm()">Đóng</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Mã đầu sách</label>
+                  <input class="input" id="title_code" placeholder="VD: DS001" />
+                </div>
+                <div class="field">
+                  <label>Tên sách</label>
+                  <input class="input" id="title_name" placeholder="VD: Clean Code" />
+                </div>
+                <div class="field">
+                  <label>Thể loại</label>
+                  <select class="select" id="title_category"></select>
+                </div>
+
+                <div class="field">
+                  <label>Tác giả</label>
+                  <input class="input" id="title_author" placeholder="VD: Robert C. Martin" />
+                </div>
+                <div class="field">
+                  <label>Nhà xuất bản</label>
+                  <input class="input" id="title_publisher" placeholder="VD: Prentice Hall" />
+                </div>
+                <div class="field">
+                  <label>Số trang</label>
+                  <input class="input" id="title_pages" type="number" min="1" placeholder="VD: 464" />
+                </div>
+
+                <div class="field">
+                  <label>Kích thước</label>
+                  <input class="input" id="title_size" placeholder="VD: 14x20cm" />
+                </div>
+                <div class="field">
+                  <label>Số lượng (tự tăng theo copies)</label>
+                  <input class="input" id="title_qty" type="number" min="0" value="0" disabled />
+                </div>
+                <div class="field"></div>
+              </div>
+              <div class="actions">
+                <button class="btn" onclick="saveTitle()">Lưu</button>
+                <button class="btn btn-secondary" onclick="closeTitleForm()">Huỷ</button>
+              </div>
+              <div class="hint">Gợi ý: Số lượng tăng/giảm theo “Book Copies”.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table" id="titles-table"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COPIES -->
+        <div id="copies-tab" class="tab-content" style="display: none;">
+          <div class="page-head">
+            <div>
+              <div class="page-title">📗 Bản sao sách</div>
+              <div class="page-subtitle">Quản lý từng bản sao (mã sách)</div>
+            </div>
+            <div class="actions">
+              <input class="input" id="copies-search" placeholder="Tìm theo mã sách / trạng thái..." oninput="renderCopies()" />
+              <button class="btn" onclick="openCopyForm()">+ Thêm</button>
+              <button class="btn btn-secondary" onclick="loadCopies(true)">↻ Tải lại</button>
+            </div>
+          </div>
+
+          <div class="card" id="copy-form-card" style="display:none;">
+            <div class="card-head">
+              <div class="card-title" id="copy-form-title">Thêm book copy</div>
+              <div class="row-actions">
+                <button class="btn btn-ghost" onclick="closeCopyForm()">Đóng</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Đầu sách</label>
+                  <select class="select" id="copy_title"></select>
+                </div>
+                <div class="field">
+                  <label>Mã sách (unique)</label>
+                  <input class="input" id="copy_code" placeholder="VD: S001-0001" />
+                </div>
+                <div class="field">
+                  <label>Ngày nhập</label>
+                  <input class="input" id="copy_import" type="date" />
+                </div>
+                <div class="field">
+                  <label>Tình trạng</label>
+                  <select class="select" id="copy_condition">
+                    <option value="good">good</option>
+                    <option value="fair">fair</option>
+                    <option value="poor">poor</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Trạng thái</label>
+                  <select class="select" id="copy_status">
+                    <option value="available">available</option>
+                    <option value="borrowed">borrowed</option>
+                    <option value="lost">lost</option>
+                    <option value="damaged">damaged</option>
+                  </select>
+                </div>
+                <div class="field"></div>
+              </div>
+              <div class="actions">
+                <button class="btn" onclick="saveCopy()">Lưu</button>
+                <button class="btn btn-secondary" onclick="closeCopyForm()">Huỷ</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table" id="copies-table"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- READERS -->
+        <div id="readers-tab" class="tab-content" style="display: none;">
+          <div class="page-head">
+            <div>
+              <div class="page-title">👤 Độc giả</div>
+              <div class="page-subtitle">Quản lý độc giả</div>
+            </div>
+            <div class="actions">
+              <input class="input" id="readers-search" placeholder="Tìm theo mã / tên / lớp..." oninput="renderReaders()" />
+              <button class="btn" onclick="openReaderForm()">+ Thêm</button>
+              <button class="btn btn-secondary" onclick="loadReaders(true)">↻ Tải lại</button>
+            </div>
+          </div>
+
+          <div class="card" id="reader-form-card" style="display:none;">
+            <div class="card-head">
+              <div class="card-title" id="reader-form-title">Thêm reader</div>
+              <div class="row-actions">
+                <button class="btn btn-ghost" onclick="closeReaderForm()">Đóng</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Mã độc giả</label>
+                  <input class="input" id="reader_code" placeholder="VD: DG001" />
+                </div>
+                <div class="field">
+                  <label>Họ tên</label>
+                  <input class="input" id="reader_name" placeholder="VD: Nguyễn Văn A" />
+                </div>
+                <div class="field">
+                  <label>Lớp</label>
+                  <input class="input" id="reader_class" placeholder="VD: DHKTPM17" />
+                </div>
+
+                <div class="field">
+                  <label>Ngày sinh</label>
+                  <input class="input" id="reader_birth" type="date" />
+                </div>
+                <div class="field">
+                  <label>Giới tính</label>
+                  <select class="select" id="reader_gender">
+                    <option value="male">male</option>
+                    <option value="female">female</option>
+                    <option value="other">other</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Trạng thái</label>
+                  <select class="select" id="reader_status">
+                    <option value="active">active</option>
+                    <option value="inactive">inactive</option>
+                  </select>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn" onclick="saveReader()">Lưu</button>
+                <button class="btn btn-secondary" onclick="closeReaderForm()">Huỷ</button>
+              </div>
+              <div class="hint">Không thể xoá reader nếu có lịch sử mượn.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table" id="readers-table"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARDS -->
+        <div id="cards-tab" class="tab-content" style="display: none;">
+          <div class="page-head">
+            <div>
+              <div class="page-title">🎫 Thẻ thư viện</div>
+              <div class="page-subtitle">Cấp/khóa thẻ thư viện</div>
+            </div>
+            <div class="actions">
+              <input class="input" id="cards-search" placeholder="Tìm theo số thẻ / mã độc giả..." oninput="renderCards()" />
+              <button class="btn" onclick="openCardForm()">+ Cấp thẻ</button>
+              <button class="btn btn-secondary" onclick="loadCards(true)">↻ Tải lại</button>
+            </div>
+          </div>
+
+          <div class="card" id="card-form-card" style="display:none;">
+            <div class="card-head">
+              <div class="card-title" id="card-form-title">Cấp thẻ</div>
+              <div class="row-actions">
+                <button class="btn btn-ghost" onclick="closeCardForm()">Đóng</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Số thẻ</label>
+                  <input class="input" id="card_number" placeholder="VD: CARD-0001" />
+                </div>
+                <div class="field">
+                  <label>Độc giả</label>
+                  <select class="select" id="card_reader"></select>
+                </div>
+                <div class="field">
+                  <label>Ngày cấp</label>
+                  <input class="input" id="card_issued" type="date" />
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn" onclick="saveCard()">Lưu</button>
+                <button class="btn btn-secondary" onclick="closeCardForm()">Huỷ</button>
+              </div>
+              <div class="hint">Mỗi reader chỉ có 1 thẻ active.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table" id="cards-table"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BORROWS -->
+        <div id="borrows-tab" class="tab-content" style="display: none;">
+          <div class="page-head">
+            <div>
+              <div class="page-title">📤 Mượn & Trả</div>
+              <div class="page-subtitle">Mượn sách: mỗi reader chỉ mượn 1 cuốn tại một thời điểm</div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-secondary" onclick="loadBorrows(true)">↻ Tải lại</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Tạo phiếu mượn</div>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Độc giả</label>
+                  <select class="select" id="borrow_reader"></select>
+                </div>
+                <div class="field">
+                  <label>Sách (available)</label>
+                  <select class="select" id="borrow_copy"></select>
+                </div>
+                <div class="field">
+                  <label>Nhân viên</label>
+                  <input class="input" id="borrow_staff" disabled />
+                  <div class="hint">Lấy từ tài khoản đang đăng nhập</div>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn" onclick="createBorrow()">Tạo phiếu</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Danh sách phiếu mượn</div>
+              <div class="actions">
+                <input class="input" id="borrows-search" placeholder="Tìm theo mã phiếu / trạng thái..." oninput="renderBorrows()" />
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table" id="borrows-table"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="reports-tab" class="tab-content" style="display: none;">
+          <div class="page-head">
+            <div>
+              <div class="page-title">📊 Báo cáo</div>
+              <div class="page-subtitle">Thống kê cơ bản</div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-secondary" onclick="loadReports(true)">↻ Tải lại</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Top sách được mượn</div>
+              <div class="actions">
+                <select class="select" id="report_top_limit" onchange="loadReports(true)" style="max-width: 200px;">
+                  <option value="5">Top 5</option>
+                  <option value="10" selected>Top 10</option>
+                  <option value="20">Top 20</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table" id="report-top-table"></table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Độc giả chưa trả sách</div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table" id="report-unreturned-table"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STAFF (ADMIN) -->
+        <div id="staff-tab" class="tab-content" style="display: none;">
+          <div class="page-head">
+            <div>
+              <div class="page-title">👨‍💼 Nhân viên</div>
+              <div class="page-subtitle">Chỉ admin được quản lý nhân viên</div>
+            </div>
+            <div class="actions">
+              <input class="input" id="staff-search" placeholder="Tìm theo mã / tên..." oninput="renderStaffs()" />
+              <button class="btn" onclick="openStaffForm()">+ Thêm</button>
+              <button class="btn btn-secondary" onclick="loadStaffs(true)">↻ Tải lại</button>
+            </div>
+          </div>
+
+          <div class="card" id="staff-form-card" style="display:none;">
+            <div class="card-head">
+              <div class="card-title" id="staff-form-title">Thêm staff</div>
+              <div class="row-actions">
+                <button class="btn btn-ghost" onclick="closeStaffForm()">Đóng</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Mã NV</label>
+                  <input class="input" id="staff_code" placeholder="VD: NV003" />
+                </div>
+                <div class="field">
+                  <label>Họ tên</label>
+                  <input class="input" id="staff_name" placeholder="VD: Trần Thị B" />
+                </div>
+                <div class="field">
+                  <label>Trạng thái</label>
+                  <select class="select" id="staff_status">
+                    <option value="active">active</option>
+                    <option value="inactive">inactive</option>
+                  </select>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn" onclick="saveStaff()">Lưu</button>
+                <button class="btn btn-secondary" onclick="closeStaffForm()">Huỷ</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table" id="staff-table"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCOUNTS (ADMIN) -->
+        <div id="accounts-tab" class="tab-content" style="display: none;">
+          <div class="page-head">
+            <div>
+              <div class="page-title">🔑 Tài khoản</div>
+              <div class="page-subtitle">Chỉ admin được quản lý tài khoản</div>
+            </div>
+            <div class="actions">
+              <input class="input" id="accounts-search" placeholder="Tìm theo username / role..." oninput="renderAccounts()" />
+              <button class="btn" onclick="openAccountForm()">+ Thêm</button>
+              <button class="btn btn-secondary" onclick="loadAccounts(true)">↻ Tải lại</button>
+            </div>
+          </div>
+
+          <div class="card" id="account-form-card" style="display:none;">
+            <div class="card-head">
+              <div class="card-title" id="account-form-title">Thêm account</div>
+              <div class="row-actions">
+                <button class="btn btn-ghost" onclick="closeAccountForm()">Đóng</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Username</label>
+                  <input class="input" id="acc_username" placeholder="VD: user01" />
+                </div>
+                <div class="field">
+                  <label>Password</label>
+                  <input class="input" id="acc_password" placeholder="VD: 123456" />
+                </div>
+                <div class="field">
+                  <label>Role</label>
+                  <select class="select" id="acc_role">
+                    <option value="admin">admin</option>
+                    <option value="librarian" selected>librarian</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Staff</label>
+                  <select class="select" id="acc_staff"></select>
+                </div>
+                <div class="field">
+                  <label>Active</label>
+                  <select class="select" id="acc_active">
+                    <option value="true" selected>true</option>
+                    <option value="false">false</option>
+                  </select>
+                </div>
+                <div class="field"></div>
+              </div>
+              <div class="actions">
+                <button class="btn" onclick="saveAccount()">Lưu</button>
+                <button class="btn btn-secondary" onclick="closeAccountForm()">Huỷ</button>
+              </div>
+              <div class="hint">Mỗi staff chỉ gắn được 1 account (unique staff_id).</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="table" id="accounts-table"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal" id="help-modal" onclick="if(event.target.id==='help-modal'){closeHelpModal();}">
+    <div class="modal-card">
+      <div class="modal-head">
+        <strong>📘 Hướng dẫn nhanh</strong>
+        <button class="btn btn-secondary" onclick="closeHelpModal()">Đóng</button>
+      </div>
+      <div class="modal-body">
+        <p>- Dùng menu bên trái để chuyển chức năng. Các tab có hiệu ứng mượt và tự tải dữ liệu.</p>
+        <p>- Nút 🔗 sao chép endpoint API để test nhanh.</p>
+        <p>- Chế độ tối được lưu tự động trong localStorage.</p>
+        <p>- Nếu dữ liệu tải chậm, bảng sẽ hiển thị skeleton tạm thời trước khi có dữ liệu thật.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toast-wrap"></div>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000/api/v1';
+
+    const state = {
+      categories: [],
+      titles: [],
+      copies: [],
+      readers: [],
+      cards: [],
+      borrows: [],
+      staffs: [],
+      accounts: [],
+
+      editing: {
+        categoryId: null,
+        titleId: null,
+        copyId: null,
+        readerId: null,
+        cardId: null,
+        staffId: null,
+        accountId: null,
+      },
+    };
+
+    let tipsIndex = 0;
+    let tipsTimer = null;
+
+    function getRole() {
+      return localStorage.getItem('role') || 'librarian';
+    }
+
+    function getStaffId() {
+      return Number(localStorage.getItem('staff_id') || '0');
+    }
+
+    function getAuthHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'X-Role': getRole(),
+        'X-Username': localStorage.getItem('username') || '',
+      };
+    }
+
+    function setTableSkeleton(tableId, cols = 6, rows = 4) {
+      const table = document.getElementById(tableId);
+      if (!table) return;
+      const head = `<thead><tr>${Array.from({ length: cols }).map(() => '<th><div class="skeleton" style="height:14px;"></div></th>').join('')}</tr></thead>`;
+      const body = `<tbody>${Array.from({ length: rows }).map(() => `<tr>${Array.from({ length: cols }).map(() => '<td><div class="skeleton" style="height:14px;"></div></td>').join('')}</tr>`).join('')}</tbody>`;
+      table.innerHTML = head + body;
+    }
+
+    function applyRippleEffect() {
+      document.querySelectorAll('.btn, .theme-btn').forEach(btn => {
+        if (btn.dataset.rippleBound === 'true') return;
+        btn.dataset.rippleBound = 'true';
+        btn.addEventListener('click', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const span = document.createElement('span');
+          span.className = 'ripple';
+          const size = Math.max(rect.width, rect.height);
+          span.style.width = `${size}px`;
+          span.style.height = `${size}px`;
+          span.style.left = `${e.clientX - rect.left - size / 2}px`;
+          span.style.top = `${e.clientY - rect.top - size / 2}px`;
+          btn.appendChild(span);
+          setTimeout(() => span.remove(), 600);
+        });
+      });
+    }
+
+    function setupRevealOnScroll() {
+      const targets = document.querySelectorAll('.card, .stat-card, .section-card');
+      targets.forEach((el) => el.classList.add('reveal'));
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('show');
+        });
+      }, { threshold: 0.1 });
+      targets.forEach((el) => observer.observe(el));
+    }
+
+    function toggleAccordion(event) {
+      const item = event.target.closest('.accordion-item');
+      if (!item) return;
+      item.classList.toggle('open');
+    }
+
+    function goTip(index) {
+      const track = document.getElementById('tips-track');
+      const dots = document.querySelectorAll('#tips-dots .dot');
+      if (!track || !dots.length) return;
+      tipsIndex = index;
+      track.style.transform = `translateX(-${index * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === index));
+    }
+
+    function startTipsCarousel() {
+      if (tipsTimer) clearInterval(tipsTimer);
+      tipsTimer = setInterval(() => {
+        tipsIndex = (tipsIndex + 1) % 3;
+        goTip(tipsIndex);
+      }, 3500);
+    }
+
+    function openHelpModal() {
+      document.getElementById('help-modal')?.classList.add('open');
+    }
+
+    function closeHelpModal() {
+      document.getElementById('help-modal')?.classList.remove('open');
+    }
+
+    function toggleUserMenu(event) {
+      event?.stopPropagation();
+      const menu = document.getElementById('user-menu');
+      menu?.classList.toggle('open');
+    }
+
+    async function copyApiEndpoint() {
+      try {
+        await navigator.clipboard.writeText(API_BASE);
+        showToast('success', 'Đã sao chép', `Endpoint: ${API_BASE}`);
+      } catch {
+        showToast('warning', 'Không thể sao chép', 'Trình duyệt đã chặn clipboard.');
+      }
+    }
+
+    function showToast(kind, title, message, ttlMs = 3200) {
+      const wrap = document.getElementById('toast-wrap');
+      const el = document.createElement('div');
+      el.className = `toast ${kind || ''}`;
+      el.innerHTML = `
+        <div>
+          <div class="toast-title">${escapeHtml(title || 'Info')}</div>
+          <div class="toast-msg">${escapeHtml(message || '')}</div>
+        </div>
+      `;
+      wrap.appendChild(el);
+      setTimeout(() => {
+        el.remove();
+      }, ttlMs);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    async function apiFetch(path, options = {}) {
+      const res = await fetch(API_BASE + path, {
+        ...options,
+        headers: {
+          ...getAuthHeaders(),
+          ...(options.headers || {}),
+        },
+      });
+
+      let data = null;
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        data = await res.text();
+      }
+
+      if (!res.ok) {
+        const msg = (data && data.detail) ? data.detail : (typeof data === 'string' ? data : 'Yêu cầu thất bại');
+        if (res.status === 403) {
+          showToast('danger', 'Không đủ quyền', msg);
+        } else {
+          showToast('danger', 'Lỗi', msg);
+        }
+        throw new Error(msg);
+      }
+
+      return data;
+    }
+
+    function todayISO() {
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${d.getFullYear()}-${mm}-${dd}`;
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '';
+      try {
+        return new Date(iso).toLocaleDateString('vi-VN');
+      } catch {
+        return iso;
+      }
+    }
+
+    function badgeStatus(value) {
+      const v = String(value || '').toLowerCase();
+      if (v === 'active' || v === 'available' || v === 'returned') return 'success';
+      if (v === 'borrowed') return 'warning';
+      if (v === 'inactive' || v === 'lost' || v === 'damaged') return 'danger';
+      return '';
+    }
+
+    // Boot
+    document.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const staffName = localStorage.getItem('staff_name') || 'User';
+      const role = getRole();
+      document.getElementById('staff-name').textContent = staffName;
+      document.getElementById('user-role').textContent = role === 'admin' ? '👑 Quản trị viên' : '📚 Thủ thư';
+      if (role === 'admin') {
+        document.getElementById('admin-section').style.display = 'block';
+      }
+
+      const isDark = localStorage.getItem('theme') === 'dark';
+      if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('theme-icon').textContent = '☀️';
+      }
+
+      document.getElementById('borrow_staff').value = `${staffName} (ID: ${getStaffId() || '—'})`;
+      document.getElementById('reader_birth').value = '';
+      document.getElementById('copy_import').value = todayISO();
+      document.getElementById('card_issued').value = todayISO();
+
+      applyRippleEffect();
+      setupRevealOnScroll();
+      startTipsCarousel();
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#user-menu')) {
+          document.getElementById('user-menu')?.classList.remove('open');
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeHelpModal();
+      });
+
+      await warmup();
+      await loadDashboardStats();
+    });
+
+    async function warmup() {
+      try {
+        await loadCategories(true);
+        await loadTitles(true);
+        await loadCopies(true);
+        await loadReaders(true);
+        await loadCards(true);
+        await loadBorrows(true);
+        if (getRole() === 'admin') {
+          await loadStaffs(true);
+          await loadAccounts(true);
+        }
+        await loadReports(true);
+      } catch (e) {
+        // individual toasts already shown
+      }
+    }
+
+    function switchTab(tabName, evt) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+      });
+
+      const tab = document.getElementById(tabName + '-tab');
+      if (tab) tab.style.display = 'block';
+
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      const eventObj = evt || window.event;
+      eventObj?.target?.closest?.('.nav-item')?.classList.add('active');
+
+      const headerTitle = document.querySelector('.header-left h1');
+      const selectedItem = eventObj?.target?.closest?.('.nav-item');
+      if (selectedItem) {
+        const icon = selectedItem.querySelector('.nav-icon')?.textContent || '📊';
+        const label = selectedItem.querySelector('.nav-label')?.textContent || 'Page';
+        headerTitle.textContent = icon + ' ' + label;
+      }
+
+      document.querySelector('.content')?.scrollTo({ top: 0, behavior: 'smooth' });
+
+      onTabShown(tabName);
+    }
+
+    async function onTabShown(tabName) {
+      try {
+        if (tabName === 'dashboard') await loadDashboardStats();
+        if (tabName === 'categories') await loadCategories(false);
+        if (tabName === 'titles') await loadTitles(false);
+        if (tabName === 'copies') await loadCopies(false);
+        if (tabName === 'readers') await loadReaders(false);
+        if (tabName === 'cards') await loadCards(false);
+        if (tabName === 'borrows') await loadBorrows(false);
+        if (tabName === 'reports') await loadReports(false);
+        if (tabName === 'staff') await loadStaffs(false);
+        if (tabName === 'accounts') await loadAccounts(false);
+      } catch (e) {
+        // already toasted
+      }
+    }
+
+    async function loadDashboardStats() {
+      try {
+        const [copies, readers, borrows] = await Promise.all([
+          apiFetch('/book-copies'),
+          apiFetch('/readers'),
+          apiFetch('/borrows'),
+        ]);
+
+        const activeBorrows = (borrows || []).filter(b => b.status === 'borrowed').length;
+
+        document.getElementById('stat-books').textContent = String((copies || []).length);
+        document.getElementById('stat-readers').textContent = String((readers || []).filter(r => r.status === 'active').length);
+        document.getElementById('stat-borrows').textContent = String(activeBorrows);
+        document.getElementById('stat-overdue').textContent = '—';
+
+        document.getElementById('stat-books-hint').textContent = 'Tổng bản sao trong kho';
+        document.getElementById('stat-readers-hint').textContent = 'Độc giả có trạng thái active';
+        document.getElementById('stat-borrows-hint').textContent = 'Phiếu đang mượn';
+      } catch {
+        document.getElementById('stat-books-hint').textContent = 'Không tải được dữ liệu';
+        document.getElementById('stat-readers-hint').textContent = 'Không tải được dữ liệu';
+        document.getElementById('stat-borrows-hint').textContent = 'Không tải được dữ liệu';
+      }
+    }
+
+    // ===== CATEGORIES =====
+    async function loadCategories(force) {
+      setTableSkeleton('categories-table', 5, 3);
+      if (!force && state.categories.length) {
+        renderCategories();
+        fillCategorySelects();
+        return;
+      }
+      state.categories = await apiFetch('/categories');
+      renderCategories();
+      fillCategorySelects();
+    }
+
+    function renderCategories() {
+      const q = (document.getElementById('categories-search')?.value || '').trim().toLowerCase();
+      const rows = (state.categories || []).filter(c => {
+        const hay = `${c.category_code} ${c.name} ${c.description || ''}`.toLowerCase();
+        return !q || hay.includes(q);
+      });
+
+      const table = document.getElementById('categories-table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Mã</th>
+            <th>Tên</th>
+            <th>Mô tả</th>
+            <th style="text-align:right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(c => `
+            <tr>
+              <td class="mono">${c.id}</td>
+              <td class="mono">${escapeHtml(c.category_code)}</td>
+              <td>${escapeHtml(c.name)}</td>
+              <td>${escapeHtml(c.description || '')}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary" onclick="editCategory(${c.id})">Sửa</button>
+                  <button class="btn btn-danger" onclick="deleteCategory(${c.id})">Xoá</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    function openCategoryForm() {
+      state.editing.categoryId = null;
+      document.getElementById('category-form-title').textContent = 'Thêm category';
+      document.getElementById('category_code').disabled = false;
+      document.getElementById('category_code').value = '';
+      document.getElementById('category_name').value = '';
+      document.getElementById('category_desc').value = '';
+      document.getElementById('category-form-card').style.display = 'block';
+      document.getElementById('category_code').focus();
+    }
+
+    function closeCategoryForm() {
+      document.getElementById('category-form-card').style.display = 'none';
+    }
+
+    function editCategory(id) {
+      const c = state.categories.find(x => x.id === id);
+      if (!c) return;
+      state.editing.categoryId = id;
+      document.getElementById('category-form-title').textContent = `Sửa category #${id}`;
+      document.getElementById('category_code').value = c.category_code;
+      document.getElementById('category_code').disabled = true;
+      document.getElementById('category_name').value = c.name;
+      document.getElementById('category_desc').value = c.description || '';
+      document.getElementById('category-form-card').style.display = 'block';
+      document.getElementById('category_name').focus();
+    }
+
+    async function saveCategory() {
+      const category_code = (document.getElementById('category_code').value || '').trim();
+      const name = (document.getElementById('category_name').value || '').trim();
+      const description = (document.getElementById('category_desc').value || '').trim();
+      if (!name || (!state.editing.categoryId && !category_code)) {
+        showToast('warning', 'Thiếu dữ liệu', 'Vui lòng nhập mã (khi thêm mới) và tên.');
+        return;
+      }
+
+      if (!state.editing.categoryId) {
+        await apiFetch('/categories', {
+          method: 'POST',
+          body: JSON.stringify({ category_code, name, description: description || null }),
+        });
+        showToast('success', 'OK', 'Đã thêm category');
+      } else {
+        await apiFetch(`/categories/${state.editing.categoryId}`, {
+          method: 'PUT',
+          body: JSON.stringify({ name, description: description || null }),
+        });
+        showToast('success', 'OK', 'Đã cập nhật category');
+      }
+
+      closeCategoryForm();
+      await loadCategories(true);
+    }
+
+    async function deleteCategory(id) {
+      if (!confirm('Xoá category này?')) return;
+      await apiFetch(`/categories/${id}`, { method: 'DELETE' });
+      showToast('success', 'OK', 'Đã xoá category');
+      await loadCategories(true);
+    }
+
+    function fillCategorySelects() {
+      const select = document.getElementById('title_category');
+      if (!select) return;
+      select.innerHTML = (state.categories || [])
+        .map(c => `<option value="${c.id}">${escapeHtml(c.category_code)} - ${escapeHtml(c.name)}</option>`)
+        .join('');
+    }
+
+    // ===== TITLES =====
+    async function loadTitles(force) {
+      setTableSkeleton('titles-table', 10, 3);
+      if (!force && state.titles.length) {
+        renderTitles();
+        fillTitleSelects();
+        return;
+      }
+      if (!state.categories.length) await loadCategories(true);
+      state.titles = await apiFetch('/book-titles');
+      renderTitles();
+      fillTitleSelects();
+    }
+
+    function categoryNameById(id) {
+      const c = state.categories.find(x => x.id === id);
+      return c ? `${c.category_code} - ${c.name}` : `#${id}`;
+    }
+
+    function renderTitles() {
+      const q = (document.getElementById('titles-search')?.value || '').trim().toLowerCase();
+      const rows = (state.titles || []).filter(t => {
+        const hay = `${t.title_code} ${t.title_name} ${t.author} ${t.publisher}`.toLowerCase();
+        return !q || hay.includes(q);
+      });
+
+      const table = document.getElementById('titles-table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Mã</th>
+            <th>Tên</th>
+            <th>Tác giả</th>
+            <th>NXB</th>
+            <th>Trang</th>
+            <th>Size</th>
+            <th>Thể loại</th>
+            <th>Số lượng</th>
+            <th style="text-align:right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(t => `
+            <tr>
+              <td class="mono">${t.id}</td>
+              <td class="mono">${escapeHtml(t.title_code)}</td>
+              <td>${escapeHtml(t.title_name)}</td>
+              <td>${escapeHtml(t.author)}</td>
+              <td>${escapeHtml(t.publisher)}</td>
+              <td class="mono">${t.page_count}</td>
+              <td>${escapeHtml(t.size)}</td>
+              <td>${escapeHtml(categoryNameById(t.category_id))}</td>
+              <td class="mono">${t.quantity}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary" onclick="editTitle(${t.id})">Sửa</button>
+                  <button class="btn btn-danger" onclick="deleteTitle(${t.id})">Xoá</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    function openTitleForm() {
+      state.editing.titleId = null;
+      document.getElementById('title-form-title').textContent = 'Thêm book title';
+      document.getElementById('title_code').disabled = false;
+      document.getElementById('title_code').value = '';
+      document.getElementById('title_name').value = '';
+      document.getElementById('title_author').value = '';
+      document.getElementById('title_publisher').value = '';
+      document.getElementById('title_pages').value = '';
+      document.getElementById('title_size').value = '';
+      document.getElementById('title_qty').value = '0';
+      fillCategorySelects();
+      document.getElementById('title-form-card').style.display = 'block';
+      document.getElementById('title_code').focus();
+    }
+
+    function closeTitleForm() {
+      document.getElementById('title-form-card').style.display = 'none';
+    }
+
+    function editTitle(id) {
+      const t = state.titles.find(x => x.id === id);
+      if (!t) return;
+      state.editing.titleId = id;
+      document.getElementById('title-form-title').textContent = `Sửa book title #${id}`;
+      document.getElementById('title_code').value = t.title_code;
+      document.getElementById('title_code').disabled = true;
+      document.getElementById('title_name').value = t.title_name;
+      document.getElementById('title_author').value = t.author;
+      document.getElementById('title_publisher').value = t.publisher;
+      document.getElementById('title_pages').value = t.page_count;
+      document.getElementById('title_size').value = t.size;
+      document.getElementById('title_qty').value = t.quantity;
+      fillCategorySelects();
+      document.getElementById('title_category').value = String(t.category_id);
+      document.getElementById('title-form-card').style.display = 'block';
+      document.getElementById('title_name').focus();
+    }
+
+    async function saveTitle() {
+      const title_code = (document.getElementById('title_code').value || '').trim();
+      const title_name = (document.getElementById('title_name').value || '').trim();
+      const author = (document.getElementById('title_author').value || '').trim();
+      const publisher = (document.getElementById('title_publisher').value || '').trim();
+      const page_count = Number(document.getElementById('title_pages').value);
+      const size = (document.getElementById('title_size').value || '').trim();
+      const category_id = Number(document.getElementById('title_category').value);
+
+      if (!title_name || (!state.editing.titleId && !title_code) || !author || !publisher || !size || !page_count || !category_id) {
+        showToast('warning', 'Thiếu dữ liệu', 'Vui lòng nhập đầy đủ thông tin book title.');
+        return;
+      }
+
+      if (!state.editing.titleId) {
+        await apiFetch('/book-titles', {
+          method: 'POST',
+          body: JSON.stringify({
+            title_code,
+            title_name,
+            publisher,
+            page_count,
+            size,
+            author,
+            quantity: 0,
+            category_id,
+          }),
+        });
+        showToast('success', 'OK', 'Đã thêm book title');
+      } else {
+        await apiFetch(`/book-titles/${state.editing.titleId}`, {
+          method: 'PUT',
+          body: JSON.stringify({ title_name, publisher, page_count, size, author, category_id }),
+        });
+        showToast('success', 'OK', 'Đã cập nhật book title');
+      }
+
+      closeTitleForm();
+      await loadTitles(true);
+      await loadCopies(true);
+    }
+
+    async function deleteTitle(id) {
+      if (!confirm('Xoá book title này? (Có thể thất bại nếu đã có borrow)')) return;
+      await apiFetch(`/book-titles/${id}`, { method: 'DELETE' });
+      showToast('success', 'OK', 'Đã xoá book title');
+      await loadTitles(true);
+      await loadCopies(true);
+    }
+
+    function fillTitleSelects() {
+      const select1 = document.getElementById('copy_title');
+      if (select1) {
+        select1.innerHTML = (state.titles || [])
+          .map(t => `<option value="${t.id}">${escapeHtml(t.title_code)} - ${escapeHtml(t.title_name)}</option>`)
+          .join('');
+      }
+    }
+
+    // ===== COPIES =====
+    async function loadCopies(force) {
+      setTableSkeleton('copies-table', 7, 3);
+      if (!force && state.copies.length) {
+        renderCopies();
+        fillBorrowSelects();
+        return;
+      }
+      if (!state.titles.length) await loadTitles(true);
+      state.copies = await apiFetch('/book-copies');
+      renderCopies();
+      fillBorrowSelects();
+    }
+
+    function titleNameById(id) {
+      const t = state.titles.find(x => x.id === id);
+      return t ? `${t.title_code} - ${t.title_name}` : `#${id}`;
+    }
+
+    function renderCopies() {
+      const q = (document.getElementById('copies-search')?.value || '').trim().toLowerCase();
+      const rows = (state.copies || []).filter(c => {
+        const hay = `${c.book_code} ${c.status} ${c.condition_status} ${titleNameById(c.book_title_id)}`.toLowerCase();
+        return !q || hay.includes(q);
+      });
+
+      const table = document.getElementById('copies-table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Mã sách</th>
+            <th>Đầu sách</th>
+            <th>Ngày nhập</th>
+            <th>Tình trạng</th>
+            <th>Trạng thái</th>
+            <th style="text-align:right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(c => `
+            <tr>
+              <td class="mono">${c.id}</td>
+              <td class="mono">${escapeHtml(c.book_code)}</td>
+              <td>${escapeHtml(titleNameById(c.book_title_id))}</td>
+              <td class="mono">${escapeHtml(String(c.import_date || ''))}</td>
+              <td><span class="badge ${badgeStatus(c.condition_status)}">${escapeHtml(c.condition_status)}</span></td>
+              <td><span class="badge ${badgeStatus(c.status)}">${escapeHtml(c.status)}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary" onclick="editCopy(${c.id})">Sửa</button>
+                  <button class="btn btn-danger" onclick="deleteCopy(${c.id})">Xoá</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    function openCopyForm() {
+      state.editing.copyId = null;
+      document.getElementById('copy-form-title').textContent = 'Thêm book copy';
+      fillTitleSelects();
+      document.getElementById('copy_title').disabled = false;
+      document.getElementById('copy_code').disabled = false;
+      document.getElementById('copy_code').value = '';
+      document.getElementById('copy_import').value = todayISO();
+      document.getElementById('copy_condition').value = 'good';
+      document.getElementById('copy_status').value = 'available';
+      document.getElementById('copy-form-card').style.display = 'block';
+      document.getElementById('copy_code').focus();
+    }
+
+    function closeCopyForm() {
+      document.getElementById('copy-form-card').style.display = 'none';
+    }
+
+    function editCopy(id) {
+      const c = state.copies.find(x => x.id === id);
+      if (!c) return;
+      state.editing.copyId = id;
+      document.getElementById('copy-form-title').textContent = `Sửa book copy #${id}`;
+      fillTitleSelects();
+      document.getElementById('copy_title').value = String(c.book_title_id);
+      document.getElementById('copy_title').disabled = true;
+      document.getElementById('copy_code').value = c.book_code;
+      document.getElementById('copy_code').disabled = true;
+      document.getElementById('copy_import').value = String(c.import_date || '').slice(0, 10);
+      document.getElementById('copy_import').disabled = true;
+      document.getElementById('copy_condition').value = c.condition_status;
+      document.getElementById('copy_status').value = c.status;
+      document.getElementById('copy-form-card').style.display = 'block';
+    }
+
+    async function saveCopy() {
+      const book_title_id = Number(document.getElementById('copy_title').value);
+      const book_code = (document.getElementById('copy_code').value || '').trim();
+      const import_date = document.getElementById('copy_import').value;
+      const condition_status = document.getElementById('copy_condition').value;
+      const status = document.getElementById('copy_status').value;
+
+      if (!book_title_id || !book_code || !import_date) {
+        showToast('warning', 'Thiếu dữ liệu', 'Vui lòng nhập đầy đủ thông tin copy.');
+        return;
+      }
+
+      if (!state.editing.copyId) {
+        await apiFetch('/book-copies', {
+          method: 'POST',
+          body: JSON.stringify({ book_title_id, book_code, condition_status, import_date }),
+        });
+        showToast('success', 'OK', 'Đã thêm book copy');
+      } else {
+        await apiFetch(`/book-copies/${state.editing.copyId}`, {
+          method: 'PUT',
+          body: JSON.stringify({ condition_status, status }),
+        });
+        showToast('success', 'OK', 'Đã cập nhật book copy');
+      }
+
+      closeCopyForm();
+      await loadCopies(true);
+      await loadTitles(true);
+      await loadBorrows(true);
+    }
+
+    async function deleteCopy(id) {
+      if (!confirm('Xoá book copy này?')) return;
+      await apiFetch(`/book-copies/${id}`, { method: 'DELETE' });
+      showToast('success', 'OK', 'Đã xoá book copy');
+      await loadCopies(true);
+      await loadTitles(true);
+      await loadBorrows(true);
+    }
+
+    // ===== READERS =====
+    async function loadReaders(force) {
+      setTableSkeleton('readers-table', 8, 3);
+      if (!force && state.readers.length) {
+        renderReaders();
+        fillReaderSelects();
+        return;
+      }
+      state.readers = await apiFetch('/readers');
+      renderReaders();
+      fillReaderSelects();
+    }
+
+    function renderReaders() {
+      const q = (document.getElementById('readers-search')?.value || '').trim().toLowerCase();
+      const rows = (state.readers || []).filter(r => {
+        const hay = `${r.reader_code} ${r.full_name} ${r.class_name} ${r.gender} ${r.status}`.toLowerCase();
+        return !q || hay.includes(q);
+      });
+
+      const table = document.getElementById('readers-table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Mã</th>
+            <th>Họ tên</th>
+            <th>Lớp</th>
+            <th>Ngày sinh</th>
+            <th>Giới tính</th>
+            <th>Trạng thái</th>
+            <th style="text-align:right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td class="mono">${r.id}</td>
+              <td class="mono">${escapeHtml(r.reader_code)}</td>
+              <td>${escapeHtml(r.full_name)}</td>
+              <td class="mono">${escapeHtml(r.class_name)}</td>
+              <td class="mono">${escapeHtml(String(r.birth_date || ''))}</td>
+              <td>${escapeHtml(r.gender)}</td>
+              <td><span class="badge ${badgeStatus(r.status)}">${escapeHtml(r.status)}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary" onclick="editReader(${r.id})">Sửa</button>
+                  <button class="btn btn-danger" onclick="deleteReader(${r.id})">Xoá</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    function openReaderForm() {
+      state.editing.readerId = null;
+      document.getElementById('reader-form-title').textContent = 'Thêm reader';
+      document.getElementById('reader_code').disabled = false;
+      document.getElementById('reader_code').value = '';
+      document.getElementById('reader_name').value = '';
+      document.getElementById('reader_class').value = '';
+      document.getElementById('reader_birth').value = '';
+      document.getElementById('reader_gender').value = 'male';
+      document.getElementById('reader_status').value = 'active';
+      document.getElementById('reader-form-card').style.display = 'block';
+      document.getElementById('reader_code').focus();
+    }
+
+    function closeReaderForm() {
+      document.getElementById('reader-form-card').style.display = 'none';
+    }
+
+    function editReader(id) {
+      const r = state.readers.find(x => x.id === id);
+      if (!r) return;
+      state.editing.readerId = id;
+      document.getElementById('reader-form-title').textContent = `Sửa reader #${id}`;
+      document.getElementById('reader_code').value = r.reader_code;
+      document.getElementById('reader_code').disabled = true;
+      document.getElementById('reader_name').value = r.full_name;
+      document.getElementById('reader_class').value = r.class_name;
+      document.getElementById('reader_birth').value = String(r.birth_date || '').slice(0, 10);
+      document.getElementById('reader_gender').value = r.gender;
+      document.getElementById('reader_status').value = r.status;
+      document.getElementById('reader-form-card').style.display = 'block';
+    }
+
+    async function saveReader() {
+      const reader_code = (document.getElementById('reader_code').value || '').trim();
+      const full_name = (document.getElementById('reader_name').value || '').trim();
+      const class_name = (document.getElementById('reader_class').value || '').trim();
+      const birth_date = document.getElementById('reader_birth').value;
+      const gender = document.getElementById('reader_gender').value;
+      const status = document.getElementById('reader_status').value;
+
+      if (!full_name || !class_name || !birth_date || (!state.editing.readerId && !reader_code)) {
+        showToast('warning', 'Thiếu dữ liệu', 'Vui lòng nhập đầy đủ thông tin reader.');
+        return;
+      }
+
+      if (!state.editing.readerId) {
+        await apiFetch('/readers', {
+          method: 'POST',
+          body: JSON.stringify({ reader_code, full_name, class_name, birth_date, gender, status }),
+        });
+        showToast('success', 'OK', 'Đã thêm reader');
+      } else {
+        await apiFetch(`/readers/${state.editing.readerId}`, {
+          method: 'PUT',
+          body: JSON.stringify({ full_name, class_name, birth_date, gender, status }),
+        });
+        showToast('success', 'OK', 'Đã cập nhật reader');
+      }
+
+      closeReaderForm();
+      await loadReaders(true);
+      await loadCards(true);
+      await loadBorrows(true);
+    }
+
+    async function deleteReader(id) {
+      if (!confirm('Xoá reader này?')) return;
+      await apiFetch(`/readers/${id}`, { method: 'DELETE' });
+      showToast('success', 'OK', 'Đã xoá reader');
+      await loadReaders(true);
+      await loadCards(true);
+      await loadBorrows(true);
+    }
+
+    function fillReaderSelects() {
+      const select = document.getElementById('card_reader');
+      if (select) {
+        select.innerHTML = (state.readers || [])
+          .map(r => `<option value="${r.id}">${escapeHtml(r.reader_code)} - ${escapeHtml(r.full_name)}</option>`)
+          .join('');
+      }
+    }
+
+    // ===== CARDS =====
+    async function loadCards(force) {
+      setTableSkeleton('cards-table', 6, 3);
+      if (!force && state.cards.length) {
+        renderCards();
+        fillBorrowSelects();
+        return;
+      }
+      if (!state.readers.length) await loadReaders(true);
+      state.cards = await apiFetch('/library-cards');
+      renderCards();
+      fillBorrowSelects();
+    }
+
+    function readerLabelById(id) {
+      const r = state.readers.find(x => x.id === id);
+      return r ? `${r.reader_code} - ${r.full_name}` : `#${id}`;
+    }
+
+    function renderCards() {
+      const q = (document.getElementById('cards-search')?.value || '').trim().toLowerCase();
+      const rows = (state.cards || []).filter(c => {
+        const hay = `${c.card_number} ${c.status} ${readerLabelById(c.reader_id)}`.toLowerCase();
+        return !q || hay.includes(q);
+      });
+
+      const table = document.getElementById('cards-table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Số thẻ</th>
+            <th>Reader</th>
+            <th>Ngày cấp</th>
+            <th>Trạng thái</th>
+            <th style="text-align:right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(c => `
+            <tr>
+              <td class="mono">${c.id}</td>
+              <td class="mono">${escapeHtml(c.card_number)}</td>
+              <td>${escapeHtml(readerLabelById(c.reader_id))}</td>
+              <td class="mono">${escapeHtml(String(c.issued_date || ''))}</td>
+              <td><span class="badge ${badgeStatus(c.status)}">${escapeHtml(c.status)}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary" onclick="toggleCardStatus(${c.id}, '${c.status === 'active' ? 'inactive' : 'active'}')">${c.status === 'active' ? 'Khoá' : 'Mở'}</button>
+                  <button class="btn btn-danger" onclick="deleteCard(${c.id})">Xoá</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    function openCardForm() {
+      state.editing.cardId = null;
+      document.getElementById('card-form-card').style.display = 'block';
+      document.getElementById('card_number').value = '';
+      document.getElementById('card_issued').value = todayISO();
+      fillReaderSelects();
+      document.getElementById('card_number').focus();
+    }
+
+    function closeCardForm() {
+      document.getElementById('card-form-card').style.display = 'none';
+    }
+
+    async function saveCard() {
+      const card_number = (document.getElementById('card_number').value || '').trim();
+      const reader_id = Number(document.getElementById('card_reader').value);
+      const issued_date = document.getElementById('card_issued').value;
+      if (!card_number || !reader_id || !issued_date) {
+        showToast('warning', 'Thiếu dữ liệu', 'Vui lòng nhập đầy đủ thông tin thẻ.');
+        return;
+      }
+
+      await apiFetch('/library-cards', {
+        method: 'POST',
+        body: JSON.stringify({ card_number, reader_id, issued_date }),
+      });
+      showToast('success', 'OK', 'Đã cấp thẻ');
+      closeCardForm();
+      await loadCards(true);
+    }
+
+    async function toggleCardStatus(cardId, status) {
+      await apiFetch(`/library-cards/${cardId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status }),
+      });
+      showToast('success', 'OK', 'Đã cập nhật trạng thái thẻ');
+      await loadCards(true);
+    }
+
+    async function deleteCard(id) {
+      if (!confirm('Xoá thẻ này?')) return;
+      await apiFetch(`/library-cards/${id}`, { method: 'DELETE' });
+      showToast('success', 'OK', 'Đã xoá thẻ');
+      await loadCards(true);
+    }
+
+    // ===== BORROWS =====
+    async function loadBorrows(force) {
+      setTableSkeleton('borrows-table', 9, 4);
+      if (!force && state.borrows.length) {
+        renderBorrows();
+        fillBorrowSelects();
+        return;
+      }
+      state.borrows = await apiFetch('/borrows');
+      renderBorrows();
+      fillBorrowSelects();
+    }
+
+    function fillBorrowSelects() {
+      const readerSel = document.getElementById('borrow_reader');
+      if (readerSel) {
+        readerSel.innerHTML = (state.readers || [])
+          .filter(r => r.status === 'active')
+          .map(r => `<option value="${r.id}">${escapeHtml(r.reader_code)} - ${escapeHtml(r.full_name)}</option>`)
+          .join('');
+      }
+
+      const copySel = document.getElementById('borrow_copy');
+      if (copySel) {
+        const available = (state.copies || []).filter(c => c.status === 'available');
+        copySel.innerHTML = available
+          .map(c => `<option value="${c.id}">${escapeHtml(c.book_code)} — ${escapeHtml(titleNameById(c.book_title_id))}</option>`)
+          .join('');
+      }
+    }
+
+    function renderBorrows() {
+      const q = (document.getElementById('borrows-search')?.value || '').trim().toLowerCase();
+      const rows = (state.borrows || []).filter(b => {
+        const hay = `${b.borrow_code} ${b.status} ${b.reader_id} ${b.book_copy_id}`.toLowerCase();
+        return !q || hay.includes(q);
+      });
+
+      const table = document.getElementById('borrows-table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Mã phiếu</th>
+            <th>Reader</th>
+            <th>Book copy</th>
+            <th>Staff</th>
+            <th>Ngày mượn</th>
+            <th>Ngày trả</th>
+            <th>Trạng thái</th>
+            <th style="text-align:right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(b => {
+            const canReturn = b.status === 'borrowed';
+            return `
+              <tr>
+                <td class="mono">${b.id}</td>
+                <td class="mono">${escapeHtml(b.borrow_code)}</td>
+                <td>${escapeHtml(readerLabelById(b.reader_id))}</td>
+                <td class="mono">#${b.book_copy_id}</td>
+                <td class="mono">#${b.staff_id}</td>
+                <td class="mono">${escapeHtml(String(b.borrow_date || ''))}</td>
+                <td class="mono">${escapeHtml(String(b.return_date || ''))}</td>
+                <td><span class="badge ${badgeStatus(b.status)}">${escapeHtml(b.status)}</span></td>
+                <td>
+                  <div class="row-actions">
+                    ${canReturn ? `<button class="btn" onclick="returnBorrow(${b.id})">Trả</button>` : `<button class="btn btn-secondary" disabled>Đã trả</button>`}
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      `;
+    }
+
+    async function createBorrow() {
+      const reader_id = Number(document.getElementById('borrow_reader').value);
+      const book_copy_id = Number(document.getElementById('borrow_copy').value);
+      const staff_id = getStaffId();
+
+      if (!reader_id || !book_copy_id || !staff_id) {
+        showToast('warning', 'Thiếu dữ liệu', 'Vui lòng chọn reader/copy và đảm bảo có staff_id.');
+        return;
+      }
+
+      await apiFetch('/borrows', {
+        method: 'POST',
+        body: JSON.stringify({ reader_id, book_copy_id, staff_id }),
+      });
+      showToast('success', 'OK', 'Đã tạo phiếu mượn');
+      await loadBorrows(true);
+      await loadCopies(true);
+      await loadDashboardStats();
+      await loadReports(true);
+    }
+
+    async function returnBorrow(borrowId) {
+      const condition_status = prompt('Tình trạng khi trả (good/fair/poor):', 'good');
+      if (!condition_status) return;
+
+      await apiFetch('/returns', {
+        method: 'POST',
+        body: JSON.stringify({ borrow_id: borrowId, condition_status }),
+      });
+      showToast('success', 'OK', 'Đã trả sách');
+      await loadBorrows(true);
+      await loadCopies(true);
+      await loadDashboardStats();
+      await loadReports(true);
+    }
+
+    // ===== REPORTS =====
+    async function loadReports(force) {
+      setTableSkeleton('report-top-table', 3, 4);
+      setTableSkeleton('report-unreturned-table', 4, 4);
+      if (!force && document.getElementById('report-top-table')?.dataset.loaded === 'true') return;
+      const limit = Number(document.getElementById('report_top_limit')?.value || '10');
+      const top = await apiFetch(`/reports/top-books?limit=${limit}`);
+      const unreturned = await apiFetch('/reports/unreturned-readers');
+      renderReports(top, unreturned);
+      document.getElementById('report-top-table').dataset.loaded = 'true';
+    }
+
+    function renderReports(top, unreturned) {
+      const topTable = document.getElementById('report-top-table');
+      topTable.innerHTML = `
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Borrow count</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${(top || []).map((r, idx) => `
+            <tr>
+              <td class="mono">${idx + 1}</td>
+              <td>${escapeHtml(r.title)}</td>
+              <td class="mono">${r.borrow_count}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+
+      const unreturnedTable = document.getElementById('report-unreturned-table');
+      unreturnedTable.innerHTML = `
+        <thead>
+          <tr>
+            <th>Reader code</th>
+            <th>Full name</th>
+            <th>Borrow code</th>
+            <th>Borrow date</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${(unreturned || []).map(r => `
+            <tr>
+              <td class="mono">${escapeHtml(r.reader_code)}</td>
+              <td>${escapeHtml(r.full_name)}</td>
+              <td class="mono">${escapeHtml(r.borrow_code)}</td>
+              <td class="mono">${escapeHtml(String(r.borrow_date || ''))}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    // ===== STAFF (ADMIN) =====
+    async function loadStaffs(force) {
+      if (getRole() !== 'admin') return;
+      setTableSkeleton('staff-table', 5, 3);
+      if (!force && state.staffs.length) {
+        renderStaffs();
+        fillStaffSelects();
+        return;
+      }
+      state.staffs = await apiFetch('/staffs');
+      renderStaffs();
+      fillStaffSelects();
+    }
+
+    function renderStaffs() {
+      const q = (document.getElementById('staff-search')?.value || '').trim().toLowerCase();
+      const rows = (state.staffs || []).filter(s => {
+        const hay = `${s.staff_code} ${s.full_name} ${s.status}`.toLowerCase();
+        return !q || hay.includes(q);
+      });
+
+      const table = document.getElementById('staff-table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Mã NV</th>
+            <th>Họ tên</th>
+            <th>Trạng thái</th>
+            <th style="text-align:right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(s => `
+            <tr>
+              <td class="mono">${s.id}</td>
+              <td class="mono">${escapeHtml(s.staff_code)}</td>
+              <td>${escapeHtml(s.full_name)}</td>
+              <td><span class="badge ${badgeStatus(s.status)}">${escapeHtml(s.status)}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary" onclick="editStaff(${s.id})">Sửa</button>
+                  <button class="btn btn-danger" onclick="deleteStaff(${s.id})">Xoá</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    function openStaffForm() {
+      state.editing.staffId = null;
+      document.getElementById('staff-form-title').textContent = 'Thêm staff';
+      document.getElementById('staff_code').disabled = false;
+      document.getElementById('staff_code').value = '';
+      document.getElementById('staff_name').value = '';
+      document.getElementById('staff_status').value = 'active';
+      document.getElementById('staff-form-card').style.display = 'block';
+      document.getElementById('staff_code').focus();
+    }
+
+    function closeStaffForm() {
+      document.getElementById('staff-form-card').style.display = 'none';
+    }
+
+    function editStaff(id) {
+      const s = state.staffs.find(x => x.id === id);
+      if (!s) return;
+      state.editing.staffId = id;
+      document.getElementById('staff-form-title').textContent = `Sửa staff #${id}`;
+      document.getElementById('staff_code').value = s.staff_code;
+      document.getElementById('staff_code').disabled = true;
+      document.getElementById('staff_name').value = s.full_name;
+      document.getElementById('staff_status').value = s.status;
+      document.getElementById('staff-form-card').style.display = 'block';
+    }
+
+    async function saveStaff() {
+      const staff_code = (document.getElementById('staff_code').value || '').trim();
+      const full_name = (document.getElementById('staff_name').value || '').trim();
+      const status = document.getElementById('staff_status').value;
+      if (!full_name || (!state.editing.staffId && !staff_code)) {
+        showToast('warning', 'Thiếu dữ liệu', 'Vui lòng nhập mã (khi thêm mới) và họ tên.');
+        return;
+      }
+
+      if (!state.editing.staffId) {
+        await apiFetch('/staffs', { method: 'POST', body: JSON.stringify({ staff_code, full_name }) });
+        showToast('success', 'OK', 'Đã thêm staff');
+      } else {
+        await apiFetch(`/staffs/${state.editing.staffId}`, { method: 'PUT', body: JSON.stringify({ full_name, status }) });
+        showToast('success', 'OK', 'Đã cập nhật staff');
+      }
+
+      closeStaffForm();
+      await loadStaffs(true);
+      await loadAccounts(true);
+    }
+
+    async function deleteStaff(id) {
+      if (!confirm('Xoá staff này?')) return;
+      await apiFetch(`/staffs/${id}`, { method: 'DELETE' });
+      showToast('success', 'OK', 'Đã xoá staff');
+      await loadStaffs(true);
+      await loadAccounts(true);
+    }
+
+    function fillStaffSelects() {
+      const select = document.getElementById('acc_staff');
+      if (!select) return;
+      select.innerHTML = (state.staffs || [])
+        .map(s => `<option value="${s.id}">${escapeHtml(s.staff_code)} - ${escapeHtml(s.full_name)}</option>`)
+        .join('');
+    }
+
+    // ===== ACCOUNTS (ADMIN) =====
+    async function loadAccounts(force) {
+      if (getRole() !== 'admin') return;
+      setTableSkeleton('accounts-table', 6, 3);
+      if (!force && state.accounts.length) {
+        renderAccounts();
+        return;
+      }
+      if (!state.staffs.length) await loadStaffs(true);
+      state.accounts = await apiFetch('/user-accounts');
+      renderAccounts();
+      fillStaffSelects();
+    }
+
+    function renderAccounts() {
+      const q = (document.getElementById('accounts-search')?.value || '').trim().toLowerCase();
+      const rows = (state.accounts || []).filter(a => {
+        const hay = `${a.username} ${a.role} ${a.is_active} ${a.staff_id}`.toLowerCase();
+        return !q || hay.includes(q);
+      });
+
+      const table = document.getElementById('accounts-table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Staff</th>
+            <th>Active</th>
+            <th style="text-align:right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(a => `
+            <tr>
+              <td class="mono">${a.id}</td>
+              <td class="mono">${escapeHtml(a.username)}</td>
+              <td><span class="badge ${badgeStatus(a.role === 'admin' ? 'active' : '')}">${escapeHtml(a.role)}</span></td>
+              <td class="mono">#${a.staff_id}</td>
+              <td><span class="badge ${badgeStatus(a.is_active === 'true' ? 'active' : 'inactive')}">${escapeHtml(a.is_active)}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-secondary" onclick="editAccount(${a.id})">Sửa</button>
+                  <button class="btn btn-danger" onclick="deleteAccount(${a.id})">Xoá</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    function openAccountForm() {
+      state.editing.accountId = null;
+      document.getElementById('account-form-title').textContent = 'Thêm account';
+      document.getElementById('acc_username').disabled = false;
+      document.getElementById('acc_username').value = '';
+      document.getElementById('acc_password').value = '';
+      document.getElementById('acc_role').value = 'librarian';
+      document.getElementById('acc_active').value = 'true';
+      fillStaffSelects();
+      document.getElementById('account-form-card').style.display = 'block';
+      document.getElementById('acc_username').focus();
+    }
+
+    function closeAccountForm() {
+      document.getElementById('account-form-card').style.display = 'none';
+    }
+
+    function editAccount(id) {
+      const a = state.accounts.find(x => x.id === id);
+      if (!a) return;
+      state.editing.accountId = id;
+      document.getElementById('account-form-title').textContent = `Sửa account #${id}`;
+      document.getElementById('acc_username').value = a.username;
+      document.getElementById('acc_username').disabled = true;
+      document.getElementById('acc_password').value = '';
+      document.getElementById('acc_role').value = a.role;
+      document.getElementById('acc_active').value = a.is_active;
+      fillStaffSelects();
+      document.getElementById('acc_staff').value = String(a.staff_id);
+      document.getElementById('acc_staff').disabled = true;
+      document.getElementById('account-form-card').style.display = 'block';
+    }
+
+    async function saveAccount() {
+      const username = (document.getElementById('acc_username').value || '').trim();
+      const password = (document.getElementById('acc_password').value || '').trim();
+      const role = document.getElementById('acc_role').value;
+      const staff_id = Number(document.getElementById('acc_staff').value);
+      const is_active = document.getElementById('acc_active').value;
+
+      if (!username || (!state.editing.accountId && !password) || !role || !staff_id) {
+        showToast('warning', 'Thiếu dữ liệu', 'Vui lòng nhập đầy đủ (password bắt buộc khi tạo mới).');
+        return;
+      }
+
+      const isEmail = username.includes('@');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (isEmail && !emailRegex.test(username)) {
+        showToast('warning', 'Sai định dạng', 'Username dạng email chưa hợp lệ.');
+        return;
+      }
+      if (!isEmail && username.length < 3) {
+        showToast('warning', 'Sai định dạng', 'Username phải có ít nhất 3 ký tự.');
+        return;
+      }
+
+      if (!state.editing.accountId) {
+        await apiFetch('/user-accounts', {
+          method: 'POST',
+          body: JSON.stringify({ username, password, role, staff_id }),
+        });
+        showToast('success', 'OK', 'Đã thêm account');
+      } else {
+        await apiFetch(`/user-accounts/${state.editing.accountId}`, {
+          method: 'PUT',
+          body: JSON.stringify({ password: password || null, role, is_active }),
+        });
+        showToast('success', 'OK', 'Đã cập nhật account');
+      }
+
+      document.getElementById('acc_staff').disabled = false;
+      closeAccountForm();
+      await loadAccounts(true);
+    }
+
+    async function deleteAccount(id) {
+      if (!confirm('Xoá account này?')) return;
+      await apiFetch(`/user-accounts/${id}`, { method: 'DELETE' });
+      showToast('success', 'OK', 'Đã xoá account');
+      await loadAccounts(true);
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        document.getElementById('theme-icon').textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('theme-icon').textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    function handleLogout() {
+      if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        localStorage.clear();
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
+</body>
+</html>
